@@ -1,0 +1,31 @@
+# M2 workflow profile.
+# M2 is the conditional branch: facility NSA claims only, with CI mapping.
+
+name: "M2"
+
+# --- Data source -----------------------------------------------------------
+query: "SELECT * FROM pend_claims_vw WHERE workflow_type = 'M2'"
+
+# --- Macro template --------------------------------------------------------
+template_path: "templates/M2_BOT_Template.xlsm"
+macro_name: "Module1.FormatClaims"   # set null for data-only load (no VBA run)
+
+# --- Transformation rules --------------------------------------------------
+zero_fill_amounts: false
+trim_ex_array: false
+m2_filter: true                  # keep NSA_FAC_IND='Y'; map PROF_CI_TO_APPLY -> CI
+
+amount_columns: ["AmtCoins", "AmtCopay", "AmtDeduct"]
+dedupe_keys: ["claim_nbr", "serv_nbr"]
+required_columns: ["claim_nbr", "serv_nbr", "PROF_CI_TO_APPLY", "NSA_FAC_IND"]
+
+# --- Template mapping ------------------------------------------------------
+# Note: after m2_filter, CI is populated from PROF_CI_TO_APPLY.
+template_map:
+  Claims: ["claim_nbr", "serv_nbr", "CI"]
+
+# --- Auto-approval guardrails ---------------------------------------------
+# M2 is tighter: missing-CI rows are routed to exceptions, so keep the
+# tolerance low and review anything unusual.
+max_rows_auto: 3000
+max_exception_pct: 0.02

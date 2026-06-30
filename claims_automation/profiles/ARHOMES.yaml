@@ -1,0 +1,28 @@
+# ARHOMES workflow profile.
+# Same transformation family as 6P (zero-fill amounts + trim ex_array).
+
+name: "ARHOMES"
+
+# --- Data source -----------------------------------------------------------
+query: "SELECT * FROM pend_claims_vw WHERE workflow_type = 'ARHOMES'"
+
+# --- Macro template --------------------------------------------------------
+template_path: "templates/ARHOMES_BOT_Template.xlsm"
+macro_name: "Module1.FormatClaims"   # set null for data-only load (no VBA run)
+
+# --- Transformation rules --------------------------------------------------
+zero_fill_amounts: true          # AmtCoins / AmtCopay / AmtDeduct -> 0.00 when null
+trim_ex_array: true              # drop first 2 chars of ex_array -> EX1toApply1
+m2_filter: false
+
+amount_columns: ["AmtCoins", "AmtCopay", "AmtDeduct"]
+dedupe_keys: ["claim_nbr", "serv_nbr"]
+required_columns: ["claim_nbr", "serv_nbr", "PROF_CI_TO_APPLY", "ex_array"]
+
+# --- Template mapping ------------------------------------------------------
+template_map:
+  Claims: ["claim_nbr", "serv_nbr", "PROF_CI_TO_APPLY"]
+
+# --- Auto-approval guardrails ---------------------------------------------
+max_rows_auto: 5000
+max_exception_pct: 0.05
