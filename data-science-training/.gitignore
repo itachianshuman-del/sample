@@ -1,0 +1,23 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+env/
+.ipynb_checkpoints/
+
+# Data & artifacts (don't commit data)
+data/
+*.csv
+*.parquet
+*.pkl
+*.joblib
+mlruns/
+*.db
+
+# OS / editor
+.DS_Store
+.idea/
+.vscode/
+*.swp

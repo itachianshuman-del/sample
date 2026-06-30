@@ -1,0 +1,26 @@
+# Core (needed for labs 01-04)
+numpy
+pandas
+scikit-learn
+scipy
+
+# Statistics / experimentation (lab 03, optional)
+statsmodels
+
+# Visualization (optional, for your own analysis)
+matplotlib
+
+# ML depth (Module 3 deliverables, optional)
+xgboost
+lightgbm
+optuna
+shap
+
+# MLOps & monitoring (Module 5 deliverables, optional)
+mlflow
+evidently
+fastapi
+uvicorn
+
+# GenAI / RAG (lab 05 uses a numpy fallback; install for real embeddings)
+sentence-transformers
