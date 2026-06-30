@@ -1,0 +1,14 @@
+# Core
+pandas>=2.0
+python-oracledb>=2.0        # Oracle connectivity (thin mode, no client needed)
+openpyxl>=3.1               # read/write .xlsm while preserving VBA (keep_vba)
+requests>=2.31             # BOT API + Teams webhook
+
+# Macro-enabled file protection handling
+msoffcrypto-tool>=5.1      # decrypt/encrypt password-protected workbooks
+xlwings>=0.31              # ONLY needed if the VBA macro must actually run (Windows + Excel)
+psutil>=5.9                # clean up orphaned Excel processes (Windows)
+
+# Optional: secrets from Azure Key Vault (falls back to env vars if absent)
+azure-identity>=1.16
+azure-keyvault-secrets>=4.8

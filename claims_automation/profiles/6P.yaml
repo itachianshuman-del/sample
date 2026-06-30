@@ -1,0 +1,33 @@
+# Example externalized workflow profile.
+# Copy this file per claim type (6P, ARHOMES, M2, COB, highdollar, ...).
+# The engine can load these instead of the in-code PROFILES registry so ops
+# can tune behaviour without code changes.
+
+name: "6P"
+
+# --- Data source -----------------------------------------------------------
+query: "SELECT * FROM pend_claims_vw WHERE workflow_type = '6P'"
+
+# --- Macro template --------------------------------------------------------
+template_path: "templates/6P_BOT_Template.xlsm"
+# Set to null for a data-only load (no VBA executed). Provide "Module.Macro"
+# only when the workbook's VBA must actually run via xlwings.
+macro_name: "Module1.FormatClaims"
+
+# --- Transformation rules --------------------------------------------------
+zero_fill_amounts: true          # AmtCoins / AmtCopay / AmtDeduct -> 0.00 when null
+trim_ex_array: true              # drop first 2 chars of ex_array -> EX1toApply1
+m2_filter: false                 # NSA_FAC_IND='Y' filter + CI mapping (M2 only)
+
+amount_columns: ["AmtCoins", "AmtCopay", "AmtDeduct"]
+dedupe_keys: ["claim_nbr", "serv_nbr"]
+required_columns: ["claim_nbr", "serv_nbr", "PROF_CI_TO_APPLY", "ex_array"]
+
+# --- Template mapping ------------------------------------------------------
+# sheet/tab name -> ordered list of source columns written into it (row 2+).
+template_map:
+  Claims: ["claim_nbr", "serv_nbr", "PROF_CI_TO_APPLY"]
+
+# --- Auto-approval guardrails ---------------------------------------------
+max_rows_auto: 5000              # above this -> parked for manual review
+max_exception_pct: 0.05          # >5% exception rows -> parked for manual review
