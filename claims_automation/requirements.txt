@@ -3,6 +3,7 @@ pandas>=2.0
 python-oracledb>=2.0        # Oracle connectivity (thin mode, no client needed)
 openpyxl>=3.1               # read/write .xlsm while preserving VBA (keep_vba)
 requests>=2.31             # BOT API + Teams webhook
+PyYAML>=6.0                # load externalized profiles/*.yaml
 
 # Macro-enabled file protection handling
 msoffcrypto-tool>=5.1      # decrypt/encrypt password-protected workbooks

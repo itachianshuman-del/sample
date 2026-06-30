@@ -47,10 +47,11 @@ from typing import Optional
 import pandas as pd
 
 from claims_pipeline import (
-    PROFILES,
     EmptyResultError,
     WorkflowProfile,
+    available_profiles,
     extract_and_transform,
+    get_profile,
     get_secret,
     log,
     retry,
@@ -291,15 +292,18 @@ def run_workflow(profile_name: str, audit: AuditStore, notifier: Notifier) -> bo
 # ======================================================================
 def main(argv: Optional[list[str]] = None) -> int:
     argv = argv if argv is not None else sys.argv[1:]
-    targets = argv if argv else list(PROFILES.keys())
+    known = available_profiles()
+    targets = argv if argv else known
 
     audit = AuditStore()
     notifier = Notifier()
     failures: list[str] = []
 
     for name in targets:
-        if name not in PROFILES:
-            log.error("Unknown workflow '%s' (known: %s)", name, list(PROFILES))
+        try:
+            get_profile(name)  # validates existence (YAML or in-code)
+        except KeyError:
+            log.error("Unknown workflow '%s' (known: %s)", name, known)
             failures.append(name)
             continue
         try:

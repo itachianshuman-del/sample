@@ -52,9 +52,16 @@ All credentials come from **environment variables** (or Azure Key Vault if
 ### Workflow profiles
 
 Each claim type is a profile (query + transform rules + template mapping +
-guardrails). They live in code (`PROFILES` in `claims_pipeline.py`) and can be
-externalized to `profiles/*.yaml` (see `profiles/6P.yaml`). Add a new claim
-type by adding a profile — no engine changes.
+guardrails). The engine resolves a profile by name in this order:
+
+1. **`profiles/<name>.yaml`** (preferred) — externalized config ops can edit
+   without touching code. Override the directory with `CLAIMS_PROFILES_DIR`.
+2. **In-code `PROFILES`** registry in `claims_pipeline.py` — fallback / defaults.
+
+Add a new claim type by dropping in a new `profiles/<name>.yaml` — no engine
+changes. Unknown keys or a missing `name`/`query`/`template_path` fail loudly
+(`ProfileError`) rather than being silently ignored. Shipped profiles: `6P`,
+`ARHOMES`, `M2`.
 
 ## Macro-enabled template handling
 

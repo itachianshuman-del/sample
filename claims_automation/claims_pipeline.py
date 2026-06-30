@@ -47,6 +47,11 @@ try:  # oracledb is optional at import time so the module loads anywhere
 except Exception:  # pragma: no cover
     oracledb = None
 
+try:  # PyYAML is optional; without it the engine uses the in-code registry
+    import yaml  # type: ignore
+except Exception:  # pragma: no cover
+    yaml = None
+
 
 # ======================================================================
 # HIPAA-safe logging
@@ -196,6 +201,83 @@ PROFILES: dict[str, WorkflowProfile] = {
     ),
 }
 
+# Directory holding externalized YAML profiles (override via env).
+PROFILES_DIR = os.getenv("CLAIMS_PROFILES_DIR", os.path.join(os.path.dirname(__file__), "profiles"))
+
+# tuple-typed fields on WorkflowProfile: YAML lists must be coerced to tuples
+_TUPLE_FIELDS = ("required_columns", "amount_columns", "dedupe_keys")
+# every field the dataclass accepts (guards against typos in YAML)
+_PROFILE_FIELDS = {
+    "name", "query", "template_path", "macro_name", "zero_fill_amounts",
+    "trim_ex_array", "m2_filter", "required_columns", "amount_columns",
+    "dedupe_keys", "template_map", "max_rows_auto", "max_exception_pct",
+}
+
+
+def profile_from_dict(data: dict) -> WorkflowProfile:
+    """Build a WorkflowProfile from a plain dict (e.g. parsed YAML).
+
+    Coerces list fields to tuples and rejects unknown keys so a typo in a
+    YAML file fails loudly instead of being silently ignored.
+    """
+    unknown = set(data) - _PROFILE_FIELDS
+    if unknown:
+        raise ProfileError(f"Profile has unknown keys: {sorted(unknown)}")
+    if not data.get("name") or not data.get("query") or not data.get("template_path"):
+        raise ProfileError("Profile must define at least 'name', 'query' and 'template_path'")
+    kwargs = dict(data)
+    for f in _TUPLE_FIELDS:
+        if f in kwargs and kwargs[f] is not None:
+            kwargs[f] = tuple(kwargs[f])
+    return WorkflowProfile(**kwargs)
+
+
+def load_yaml_profile(name: str) -> Optional[WorkflowProfile]:
+    """Load profiles/<name>.yaml if PyYAML is present and the file exists."""
+    if yaml is None:
+        return None
+    path = os.path.join(PROFILES_DIR, f"{name}.yaml")
+    if not os.path.exists(path):
+        path = os.path.join(PROFILES_DIR, f"{name}.yml")
+        if not os.path.exists(path):
+            return None
+    try:
+        with open(path, "r", encoding="utf-8") as fh:
+            data = yaml.safe_load(fh) or {}
+    except Exception as exc:
+        raise ProfileError(f"Failed to parse profile '{path}': {exc}") from exc
+    profile = profile_from_dict(data)
+    log.info("Loaded profile '%s' from %s", name, path)
+    return profile
+
+
+def get_profile(name: str) -> WorkflowProfile:
+    """Resolve a profile: prefer externalized YAML, fall back to the in-code registry."""
+    profile = load_yaml_profile(name)
+    if profile is not None:
+        return profile
+    if name in PROFILES:
+        log.info("Loaded profile '%s' from in-code registry", name)
+        return PROFILES[name]
+    raise KeyError(
+        f"Unknown workflow profile '{name}'. Looked in {PROFILES_DIR} and "
+        f"in-code registry {list(PROFILES)}"
+    )
+
+
+def available_profiles() -> list[str]:
+    """Names available from YAML files plus the in-code registry (deduplicated)."""
+    names = set(PROFILES)
+    if yaml is not None and os.path.isdir(PROFILES_DIR):
+        for fn in os.listdir(PROFILES_DIR):
+            if fn.endswith((".yaml", ".yml")):
+                names.add(os.path.splitext(fn)[0])
+    return sorted(names)
+
+
+class ProfileError(RuntimeError):
+    """Raised when a YAML profile is malformed or has invalid keys."""
+
 
 # ======================================================================
 # Extraction
@@ -343,9 +425,7 @@ class SchemaError(RuntimeError):
 # Convenience entry point
 # ======================================================================
 def extract_and_transform(profile_name: str) -> tuple[pd.DataFrame, pd.DataFrame, WorkflowProfile]:
-    if profile_name not in PROFILES:
-        raise KeyError(f"Unknown workflow profile '{profile_name}'. Known: {list(PROFILES)}")
-    profile = PROFILES[profile_name]
+    profile = get_profile(profile_name)
     extractor = OracleExtractor()
     raw = extractor.fetch(profile.query)
     clean, exceptions = ClaimsTransformer(profile).run(raw)
