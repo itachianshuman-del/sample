@@ -1,0 +1,93 @@
+# 📚 The Data Science Resource Library
+
+A **structured, topic-by-topic library** of the best data science & AI resources
+on the internet — each topic in its own folder with explained concepts, curated
+links (courses, YouTube, books, GitHub), **runnable code**, and **real-world use
+cases**.
+
+> This complements the [`data-science-training/`](../data-science-training/)
+> program. That folder is the *curriculum* (what to do, week by week). This folder
+> is the *library* (deep reference per topic — come here to learn or look things up).
+
+---
+
+## 🗺️ How this library is organized
+
+Every topic folder follows the **same structure**, so it's predictable and easy
+to navigate:
+
+```
+<topic>/README.md
+├── 📌 What it is & why it matters     → the concept, explained simply
+├── 🧠 Core concepts                    → the key ideas you must know
+├── 📚 Best resources                   → curated courses / videos / books / repos
+├── 💻 Code example                     → a concrete, real snippet
+├── 🌍 Real-world use cases             → where this is used in industry
+├── 🛠️ Hands-on project ideas           → build something to cement it
+└── 🗺️ Suggested learning path          → the order to learn it in
+```
+
+---
+
+## 📂 Topics (the map)
+
+### Foundations
+| # | Topic | What you'll find |
+|---|---|---|
+| 01 | [Python for Data Science](./01-python-for-data-science/) | NumPy, pandas, Polars, clean code |
+| 02 | [SQL & Databases](./02-sql-and-databases/) | Joins, window functions, optimization |
+| 03 | [Statistics & Probability](./03-statistics-and-probability/) | Inference, distributions, hypothesis testing |
+| 16 | [Data Visualization](./16-data-visualization/) | matplotlib, seaborn, Plotly, storytelling |
+
+### Core Machine Learning
+| # | Topic | What you'll find |
+|---|---|---|
+| 04 | [Machine Learning](./04-machine-learning/) | Algorithms, pipelines, gradient boosting |
+| 05 | [Deep Learning](./05-deep-learning/) | Neural nets, PyTorch, transformers |
+| 06 | [NLP](./06-nlp/) | Text processing, embeddings, transformers |
+| 07 | [Computer Vision](./07-computer-vision/) | CNNs, object detection, YOLO |
+| 08 | [Time Series](./08-time-series/) | Forecasting, ARIMA, Prophet, Nixtla |
+
+### Generative AI
+| # | Topic | What you'll find |
+|---|---|---|
+| 11 | [LLMs](./11-llm/) | How they work, fine-tuning, serving |
+| 12 | [RAG](./12-rag/) | Retrieval-augmented generation, end-to-end |
+| 13 | [Prompt Engineering](./13-prompt-engineering/) | Techniques, structured output, eval |
+| 14 | [AI Agents](./14-ai-agents/) | Tool use, LangGraph, CrewAI, multi-agent |
+
+### Production & Career
+| # | Topic | What you'll find |
+|---|---|---|
+| 09 | [MLOps](./09-mlops/) | Deployment, monitoring, CI/CD for ML |
+| 10 | [Data Engineering](./10-data-engineering/) | Pipelines, dbt, Spark, warehouses |
+| 15 | [Interview Prep](./15-interview-prep/) | SQL, ML, stats, system design questions |
+
+---
+
+## 🚀 Suggested paths through the library
+
+**If you're solidifying fundamentals:** 01 → 02 → 03 → 16 → 04
+**If you're going into GenAI:** 04 → 05 → 06 → 11 → 13 → 12 → 14
+**If you're moving toward production:** 04 → 09 → 10 → 15
+**If you're prepping for interviews:** 15 (then drill the gaps it reveals)
+
+---
+
+## 🌟 About the curation
+
+Resources here are chosen for **signal, not volume**. Each topic highlights a
+small number of genuinely excellent sources rather than an exhaustive dump. You'll
+see recurring world-class creators and orgs:
+
+- **Krish Naik** — one of the most popular and complete free DS/GenAI educators
+  (YouTube + the *Grand Complete Data Science Materials* repo).
+- **Andrew Ng / DeepLearning.AI**, **Stanford (CS229, CS231n)**, **StatQuest
+  (Josh Starmer)**, **3Blue1Brown**, **Andrej Karpathy**, **fast.ai**.
+- Official docs and authoritative open-source repos for each tool.
+
+> **Attribution & licensing:** all external materials belong to their respective
+> authors and are only *linked* here. Descriptions are paraphrased summaries
+> written for this library. Content was rephrased for compliance with licensing
+> restrictions — always refer to the linked original for authoritative detail.
+> Links and tool versions move fast; re-check periodically.
